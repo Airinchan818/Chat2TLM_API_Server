@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat2TLM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+  <div class="w-full max-w-lg bg-gray-800 p-6 rounded-2xl shadow-lg">
+    <h1 class="text-2xl font-bold mb-4 text-center">Chat To TLM (Tiny Language Model)</h1>
+
+
+    <textarea
+      id="userInput"
+      class="w-full p-3 text-black rounded-md mb-4"
+      placeholder="Type your prompt here..."></textarea>
+
+
+    <button
+      onclick="sendRequest()"
+      class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold transition">
+      Send
+    </button>
+
+
+    <div id="output" class="mt-4 p-4 bg-gray-700 rounded-md min-h-[100px]">
+      <p class="text-gray-300">Output will appear here...</p>
+    </div>
+  </div>
+
+  <script>
+    async function sendRequest() {
+      const input = document.getElementById('userInput').value;
+      const output = document.getElementById('output');
+      output.innerHTML = "<p class='text-gray-400'>Responsing...</p>";
+
+      try {
+        const res = await fetch('/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ text: input })
+        });
+
+        const data = await res.json();
+
+
+        if (res.ok) {
+          output.innerHTML = `<p class="text-green-400 whitespace-pre-line">${data.response}</p>`;
+        } else {
+          output.innerHTML = `<p class="text-red-400">Error: ${data.detail || "Something went wrong"}</p>`;
+        }
+      } catch (e) {
+        output.innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
